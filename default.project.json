@@ -6,12 +6,34 @@
     "ReplicatedStorage": {
       "Shared": {
         "$path": "src/shared"
+      },
+      "Packages": {
+        "$path": "Packages"
+      },
+      "UI": {
+        "$path": "src/UI"
+      },
+      "Assets": {
+        "$className": "Folder",
+        "ClientFX": {
+          "$path": "src/client_fx",
+          "$className": "Folder"
+        }
       }
     },
 
     "ServerScriptService": {
       "Server": {
         "$path": "src/server"
+      },
+      "Packages": {
+        "$path": "ServerPackages"
+      }
+    },
+
+    "ServerStorage":{
+      "ServerStorage": {
+        "$path": "src/server_storage"
       }
     },
 
