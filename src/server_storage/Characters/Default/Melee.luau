@@ -10,19 +10,26 @@ local Velocity = require(UtilitiesFolder.Combat.Velocity)
 local ActionSession = require(UtilitiesFolder.Combat.ActionSession)
 local AsyncTimer = require(UtilitiesFolder.AsyncTimer)
 local SoundManagerService = require(ServerScriptService.Server.Services.SoundManagerService)
+local ClientFXService = require(ServerScriptService.Server.Services.ClientFXService)
+local StunService = require(ServerScriptService.Server.Services.StunService)
 
 local CONFIG = {
     M1Cooldown = 0.3,
     ComboCooldown = 1.2,
+    Velocity = {
+        ZAxis = 35, 
+        YAxis = 15,
+    },
 }
 
 local Melee = {}
 Melee.__index = Melee
 Melee.M1anims = {
-    [1] = 109332345017518,
-    [2] = 116598628098678,
-    [3] = 88790772873415,
-    [4] = 137132189634903,
+    [1] = 90039212930093,
+    [2] = 80291911899085,
+    [3] = 111790066139844,
+    [4] = 70861267663329,
+    [5] = 112225982123031,
 }
 
 Melee.SwingSFX = {
@@ -128,12 +135,28 @@ function Melee:M1()
             if not ehrp then return end
 
             hitChar.Humanoid:TakeDamage(10)
+            StunService:Stun(hitChar, {
+                stunPriority = 2,
+                stunDuration = 1,
+                stunSpeed = 0,
+                canRotate = false,
+            })
             --AnimationService:Play(hitChar, self.hitAnims[animToPlay])
-
-            self:ApplyVelocity(hitChar)
             MoveUtils:FacePlayer(ehrp, self.hrp)
 
             --SoundManagerService:Play(self.hitSFX[animToPlay], hitChar)
+
+            if animToPlay == #self.M1anims then
+                MoveUtils:RagdollCharacter(hitChar, 1.5)
+                
+                local cf = self.hrp.CFrame
+                local bv = Velocity.CreateBV(ehrp, Vector3.new(math.huge, math.huge, math.huge))
+                bv.Velocity = (cf.LookVector * CONFIG.Velocity.ZAxis) + (cf.UpVector * CONFIG.Velocity.YAxis)
+
+                Debris:AddItem(bv, 0.2)
+            else
+                self:ApplyVelocity(hitChar)
+            end
         end)
 
         session.hitbox = hb

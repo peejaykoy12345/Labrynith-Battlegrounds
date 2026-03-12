@@ -6,7 +6,7 @@ local remotes = require(ReplicatedStorage.Packages.remotes)
 
 local ClientFXEvent: RemoteEvent = remotes:getEventAsync("ClientFX")
 
-local ClientFX = ReplicatedStorage["Assets (New)"].ClientFX
+local ClientFX = ReplicatedStorage.Assets.ClientFX
 
 local ClientFXController = Knit.CreateController {
     Name = "ClientFXController",

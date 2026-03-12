@@ -16,7 +16,9 @@ end
 function BufferService.TryConsumeBuffer(plr: Player)	
 	local buffered = InputBuffer[plr]
 	if not buffered then return end
-	if os.clock() - buffered.time > BUFFER_TIME then
+
+	local timePassed = os.clock() - buffered.time
+	if timePassed > BUFFER_TIME then
 		InputBuffer[plr] = nil
 		return
 	end

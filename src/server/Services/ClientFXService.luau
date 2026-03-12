@@ -10,4 +10,8 @@ local ClientFXService = Knit.CreateService{
     Client = {}
 }
 
+function ClientFXService:Start(fxData, args)
+    ClientFXEvent:FireAllClients(fxData, args)
+end
+
 return ClientFXService

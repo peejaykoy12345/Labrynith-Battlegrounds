@@ -10,10 +10,26 @@ local M1Controller = Knit.CreateController {
 function M1Controller:KnitStart()
     self.ActionService = Knit.GetService("ActionService")
 
+    local isHold = false
+
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return end
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            self.ActionService:PerformAction("M1", {})
+            isHold = true
+
+            task.spawn(function()
+                while isHold do
+                    self.ActionService:PerformAction("M1", {})
+                    task.wait(0.5)
+                end
+            end)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isHold = false
         end
     end)
 end

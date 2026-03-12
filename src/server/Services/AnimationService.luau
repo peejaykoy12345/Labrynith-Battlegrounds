@@ -57,7 +57,6 @@ type playOptionsParams = {
 function AnimationService:Play(character: Model, animationId: string, playOptionsParams: playOptionsParams?)
     playOptionsParams = playOptionsParams or {}
 
-    print("Playing...")
     local animator = getAnimator(character)
     if not animator then return nil end
 
