@@ -42,7 +42,7 @@ Melee.M1anims = {
     [5] = 112225982123031,
 }
 
-Melee.UppercutAnim = 93453910872508
+Melee.UppercutAnim = 104594668247886
 Melee.DownslamAnim = 79508274626349
 
 Melee.SwingSFX = {
