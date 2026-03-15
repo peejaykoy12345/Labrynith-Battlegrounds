@@ -16,7 +16,7 @@ function MoveUtils:CreateStandardHitbox(config)
 	local hitbox = Hitbox.CreateHitbox()
 	hitbox.Size = config.SIZE or Vector3.new(4, 4, 4)
 	hitbox.CFrame = config.CFrame or CFrame.new(0, 0, 0)
-	hitbox.Visualizer = false --config.VISUALIZER ~= false 
+	hitbox.Visualizer = config.VISUALIZER ~= false 
 	return hitbox
 end
 
