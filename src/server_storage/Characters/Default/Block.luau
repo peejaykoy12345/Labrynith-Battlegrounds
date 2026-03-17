@@ -5,8 +5,7 @@ local ActionSession = require(ServerScriptService.Server.Utilities.Combat.Action
 local Block = {}
 Block.__index = Block
 
-Block.Anims = 94528668053133
-
+Block.Anims = 124706259758375
 local BlockSessions = {}
 
 function Block:Start(char)

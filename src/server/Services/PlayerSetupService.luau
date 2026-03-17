@@ -33,8 +33,8 @@ function PlayerSetupService:SetupCharacter(player: Player, character: Model)
     Motor6D.Name = "RightGrip"
     Motor6D.Part0 = RightArm
     Motor6D.Part1 = dagger
-    Motor6D.C0 = armAttachment.CFrame
-    Motor6D.C1 = daggerAttachment.CFrame
+    Motor6D.C0 = daggerAttachment.CFrame
+    Motor6D.C1 = CFrame.new(0, 0, 0)
     Motor6D.Parent = RightArm
 end
 
