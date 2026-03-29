@@ -20,8 +20,8 @@ local Dash = {}
 Dash.__index = Dash
 
 Dash.Anims = {
-    Forward = 119388231419633,
-    ForwardHit = 86003346268818,
+    Forward = 83283118074837,
+    ForwardHit = 111138858862861,
     Backward = 137300805778395,
     Left = 131173041479328,
     Right = 118374148894248,

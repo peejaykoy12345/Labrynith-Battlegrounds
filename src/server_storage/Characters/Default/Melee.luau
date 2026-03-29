@@ -126,6 +126,8 @@ function Melee:_CreateSession()
 end
 
 function Melee:_CreateHitbox(session, onTouched, validateHitParams)
+    if session.stopped then return end
+    
     validateHitParams = validateHitParams or self.ValidateHitParams
 
     local hb = MoveUtils:CreateStandardHitbox({

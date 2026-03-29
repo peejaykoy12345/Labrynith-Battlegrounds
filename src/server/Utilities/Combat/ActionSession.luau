@@ -39,9 +39,12 @@ export type ActionSessionParams = {
 local CharacterAttackSessions = {}
 
 function ActionSession.StopSession(char)
-    if CharacterAttackSessions[char] then
-        CharacterAttackSessions[char]:Stop(true)
+    local sessions = CharacterAttackSessions[char]
+    if not sessions then return end
+    for _, session in ipairs(sessions) do
+        session:Stop(true)
     end
+    CharacterAttackSessions[char] = nil
 end
 
 function ActionSession.new(params: ActionSessionParams)
@@ -49,21 +52,38 @@ function ActionSession.new(params: ActionSessionParams)
     assert(params.actionName, "actionName is required")
     assert(params.actionType, "ActionType is required")
 
+    if not CharacterAttackSessions[params.attacker] then
+        CharacterAttackSessions[params.attacker] = {}
+    end
+
+    local sessions = CharacterAttackSessions[params.attacker]
+    for _, pastSession in ipairs(sessions) do
+        if pastSession.actionType == "Overrideable" then
+            pastSession:Stop(true)
+        end
+    end
+
     local self = setmetatable({}, ActionSession)
 
     self.attacker = params.attacker
     self.actionName = params.actionName
     self.actionType = params.actionType
     self.cooldown = params.cooldown
-
     self.states = params.states
-
     self.animations = {}
     self.targets = {}
-
     self.options = params
 
-    CharacterAttackSessions[self.attacker] = self
+    self.stopped = false
+
+    table.insert(CharacterAttackSessions[self.attacker], self)
+
+    local conn
+
+    conn = self.attacker.Humanoid.Died:Connect(function()
+        self:Stop(true)
+        conn:Disconnect()
+    end)
 
     return self
 end
@@ -140,8 +160,14 @@ function ActionSession:Start()
 end
 
 function ActionSession:Stop(forcestop: boolean?)
+    local sessions = CharacterAttackSessions[self.attacker]
+    if sessions then
+        TableUtils:ArrayRemove(sessions, self)
+    end
+
+    self.stopped = true
+
     if forcestop then
-        print("Stopping")
         self:StopAllAnimations()
     end
 
@@ -164,7 +190,10 @@ function ActionSession:Stop(forcestop: boolean?)
         end
     end
 
-    -- After each action session is stopped, check if there are any buffered inputs to consume
+    if self.extraStopFunction then
+        self.extraStopFunction(self)
+    end
+
     local plr = Players:GetPlayerFromCharacter(self.attacker)
     if plr then
         BufferInput.TryConsumeBuffer(plr)
