@@ -6,7 +6,6 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ActionSession = require(ServerScriptService.Server.Utilities.Combat.ActionSession)
 local MoveUtils = require(ServerScriptService.Server.Utilities.Combat.MoveUtils)
 local StateManager = require(ServerScriptService.Server.Utilities.Combat.StateManager)
-local Velocity = require(ServerScriptService.Server.Utilities.Combat.Velocity)
 
 local ClientFXService = require(ServerScriptService.Server.Services.ClientFXService)
 local AnimationService = require(ServerScriptService.Server.Services.AnimationService)
@@ -15,6 +14,7 @@ local CooldownService = require(ServerScriptService.Server.Services.CooldownServ
 local remotes = require(ReplicatedStorage.Packages.remotes)
 
 local DashEvent: RemoteEvent = remotes:getEventAsync("Dash")
+local UnDashEvent: RemoteEvent = remotes:getEventAsync("UnDash")
 
 local Dash = {}
 Dash.__index = Dash
@@ -33,7 +33,6 @@ Dash.Effects = {
 
 function Dash.CanDash(char: Model, dir): boolean
     local SideDash = dir == "Left" or dir == "Right"
-
     local dashType = SideDash and "SideDash" or "Dash"
 
     if StateManager.HasState(char, "Ragdoll") and not CooldownService:IsOnCooldown(char, "RagdollCancel") then
@@ -74,69 +73,6 @@ function Dash:_CreateHitbox(char: Model, session, onTouched, validateHitParams)
     end)
 end
 
-function Dash:_ApplyVelocity(char: Model, dir: string)
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-
-    local isForward = dir == "Forward"
-    local isBackward = dir == "Backward"
-    local isMain = not (dir == "Right" or dir == "Left")
-
-    local speed = if isForward then (130 * .75) elseif isBackward then 70 else 140
-    local multiplier = if isForward then .95 else 0.98
-    local int = speed
-    local usedint = int
-
-    local dirVector = if isForward then Vector3.new(0, 0, -1)
-        elseif isBackward then Vector3.new(0, 0, 1)
-        elseif dir == "Right" then Vector3.new(1, 0, 0)
-        else Vector3.new(-1, 0, 0)
-
-    if hrp:FindFirstChild("DashAttachment") then
-        hrp:FindFirstChild("DashAttachment"):Destroy()
-    end
-
-    local attachment = Instance.new("Attachment")
-    attachment.Name = "DashAttachment"
-    attachment.Parent = hrp
-
-    local lv = Velocity.CreateLV(hrp, {
-        Attachment = attachment,
-        Velocity = dirVector * usedint,
-        Lifetime = if isForward then .5 elseif isMain then .9 else 0.15
-    })
-
-    if isBackward then
-        task.delay(.5, function()
-            usedint = 0
-            task.wait(.2)
-            usedint = 150
-        end)
-    end
-
-    if isForward then
-        task.delay(.365, function()
-            multiplier = .625
-            int = 30
-            usedint = 30
-        end)
-    end
-
-    task.spawn(function()
-        while lv.Parent do
-            int *= multiplier
-            usedint = int
-            lv.VectorVelocity = dirVector * usedint
-            if int <= 1 then break end
-            task.wait(1 / 60)
-        end
-        if lv and lv.Parent then lv:Destroy() end
-        if attachment and attachment.Parent then attachment:Destroy() end
-    end)
-
-    return lv
-end
-
 function Dash:_FireHitFX(hitChar)
 end
 
@@ -162,23 +98,24 @@ function Dash:Dash(char: Model, dir: string)
 
     if not session then return end
 
+    local plr = Players:GetPlayerFromCharacter(char)
+
     session:Start()
 
     if StateManager.HasState(char, "Ragdoll") then
-        
         CooldownService:SetCooldown(char, "RagdollCancel", 10)
         MoveUtils:UnragdollCharacter(char)
     end
 
     local track = session:PlayAndAddAnimation(char, Dash.Anims[dir], { Priority = 3 })
 
-    local lv = self:_ApplyVelocity(char, dir)
     session.extraStopFunction = function()
-        print("Destroyed")
-        if lv then lv:Destroy() end
+        if plr then
+            UnDashEvent:FireClient(plr)
+        end
     end
 
-    local trackLength = track.Length 
+    local trackLength = track.Length
     if trackLength <= 0 then
         trackLength = .5
     else
@@ -186,7 +123,7 @@ function Dash:Dash(char: Model, dir: string)
     end
 
     if dir == "Forward" then
-        track:AdjustSpeed(.7) 
+        track:AdjustSpeed(.7)
 
         local punched = false
 
@@ -221,28 +158,6 @@ function Dash:Dash(char: Model, dir: string)
             end)
         end
 
-        --[[task.delay(trackLength / 2, function()
-            local hrp = char:FindFirstChild("HumanoidRootPart")
-            if not hrp then return end
-            local hb = MoveUtils:CreateStandardHitbox({
-                SIZE = Vector3.new(5, 1, -10),
-                CFrame = hrp.CFrame * CFrame.new(0, 0, -3)
-            })
-            hb:Start()
-
-            MoveUtils:WeldHitboxToPart(hrp, hb, CFrame.new(0, 0, -3))
-
-            hb.Touched:Connect(function(hitChar)
-                if not MoveUtils:ValidateHit(char, hitChar) then return end
-                hb:Stop()
-                punch()
-            end)
-
-            task.delay(0.3, function()
-                hb:Stop()
-            end)
-        end)]]
-
         task.delay(trackLength, function()
             punch()
         end)
@@ -252,10 +167,9 @@ function Dash:Dash(char: Model, dir: string)
         end)
     end
 
-    local plr = Players:GetPlayerFromCharacter(char)
-    if not plr then return end
-
-    --DashEvent:FireClient(plr, dir)
+    if plr then
+        DashEvent:FireClient(plr, dir)
+    end
 end
 
 return Dash
