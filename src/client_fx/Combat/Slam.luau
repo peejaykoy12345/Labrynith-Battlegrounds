@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService")
 local RaycastHelper = require(ReplicatedStorage.Packages.RaycastHelper)
 
 local RocksModule = require(script.Parent.RocksModule)
+local CraterModule = require(script.Parent.CraterModule)
 local VFXUtils = require(ReplicatedStorage.Shared.Utils.VFXUtils)
 
 local module = {}
@@ -44,7 +45,17 @@ function module:Start(args)
         if result then
             local pos = result.Position
 
-            RocksModule.Ground(pos, 8, Vector3.new(1.2, .9, 1.2) * 2, nil, 8, false, 1.4)
+            --RocksModule.Ground(pos, 8, Vector3.new(1.2, .9, 1.2) * 2, nil, 8, false, 1.4)
+            CraterModule.formCrater({
+                Position = pos,
+                Radius = tonumber(10);
+                rockSize = tonumber(2)
+            })
+            CraterModule.formCrater({
+                Position = pos,
+                Radius = tonumber(15);
+                rockSize = tonumber(3)
+            })
             CanContinue = false
         end
     end)
