@@ -37,7 +37,7 @@ local function startWalkAnim()
     if walkTrack then return end
     local char = getChar()
     if not char then return end
-    walkTrack = AnimationPlayer:Play(char, WALK_ANIM_ID, { Priority = 2 })
+    walkTrack = AnimationPlayer:Play(char, WALK_ANIM_ID)
 end
 
 local function stopWalkAnim()
@@ -46,20 +46,9 @@ local function stopWalkAnim()
     walkTrack = nil
 end
 
-local function setSpeed(speed: number)
-    local char = getChar()
-    if not char then return end
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if not hum then return end
-    hum.WalkSpeed = speed
-end
-
-function RunController:KnitStart()
-    setSpeed(WALK_SPEED)
-
+function RunController:KnitStart() 
     Players.LocalPlayer.CharacterAdded:Connect(function()
         task.wait()
-        setSpeed(WALK_SPEED)
         walkTrack = nil
     end)
 

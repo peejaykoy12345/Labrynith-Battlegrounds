@@ -14,6 +14,8 @@ function PlayerSetupService:KnitStart()
     Players.PlayerAdded:Connect(function(player)
         player.CharacterAdded:Connect(function(character)
             self:SetupCharacter(player, character)
+
+            character.Humanoid.WalkSpeed = 20
         end)
     end)
 end
