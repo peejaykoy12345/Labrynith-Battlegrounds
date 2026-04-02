@@ -1,5 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local AnimationService = require(ServerScriptService.Server.Services.AnimationService)
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
@@ -9,13 +12,17 @@ local PlayerSetupService = Knit.CreateService {
 }
 
 function PlayerSetupService:KnitStart()
-    -- Placeholder
+    self.AnimationService = Knit.GetService("AnimationService")
 
     Players.PlayerAdded:Connect(function(player)
         player.CharacterAdded:Connect(function(character)
             self:SetupCharacter(player, character)
 
             character.Humanoid.WalkSpeed = 20
+            
+            player.CharacterAppearanceLoaded:Wait()
+            task.wait(0.5)
+            self.AnimationService:Play(character, 85866271350050)
         end)
     end)
 end
