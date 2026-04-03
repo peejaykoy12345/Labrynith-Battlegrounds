@@ -13,6 +13,7 @@ function Hit:Start(args)
 	HL.FillTransparency = 0.5
 	HL.OutlineTransparency = 0
 	HL.Adornee = target
+	HL.FillColor = Color3.fromRGB(255, 255, 255)
 
 	-- Tween to fade out quickly
 	--VFXUtils.Tween(HL, {FillTransparency = 1, OutlineTransparency = 1}, 0.15)

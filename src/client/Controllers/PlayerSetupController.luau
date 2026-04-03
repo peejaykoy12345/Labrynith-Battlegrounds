@@ -12,15 +12,18 @@ local PlayerSetupController = Knit.CreateController{
 local plr = Players.LocalPlayer
 
 function PlayerSetupController:KnitStart()
-
     local char = plr.Character
     while not char do
         char = plr.Character
         task.wait(0.1)
     end
 
-    task.wait(0.5)
     Hit:Start({target = char})
+
+    plr.CharacterAdded:Connect(function(character)
+        plr.CharacterAppearanceLoaded:Wait()
+        Hit:Start({target = character})
+    end)
 end
 
 return PlayerSetupController

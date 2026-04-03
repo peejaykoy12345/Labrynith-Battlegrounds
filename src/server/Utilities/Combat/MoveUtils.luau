@@ -8,6 +8,9 @@ local CooldownService = require(ServerScriptService.Server.Services.CooldownServ
 local StateManager = require(CombatUtilities.StateManager)
 local BlockUtils = require(CombatUtilities.BlockUtils)
 
+local ServicesFolder = ServerScriptService.Server.Services
+local PositionService = require(ServicesFolder.Misc.PositionService)
+
 local MoveUtils = {}
 
 function MoveUtils:CreateStandardHitbox(config)
@@ -83,7 +86,7 @@ function MoveUtils:RegisterHit(attacker, target)
 end
 
 type ValidateHitParams = {
-	StatesToSkip: {[string]: boolean}
+	StatesToSkip: {[string]: boolean},
 }
 
 function MoveUtils:ValidateHit(attacker, target, params: ValidateHitParams?): boolean
@@ -108,6 +111,8 @@ function MoveUtils:ValidateHit(attacker, target, params: ValidateHitParams?): bo
 		local blockAngle = params.blockAngle
 		if BlockUtils.IsBlocking(hrp.Position, target, blockAngle) then return false end
 	end
+
+	
 
 	return true
 end
