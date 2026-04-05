@@ -112,7 +112,6 @@ function MoveUtils:ValidateHit(attacker, target, params: ValidateHitParams?): bo
 		if BlockUtils.IsBlocking(hrp.Position, target, blockAngle) then return false end
 	end
 
-	
 
 	return true
 end
